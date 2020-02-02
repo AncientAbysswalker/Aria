@@ -5,11 +5,6 @@ import wx
 import os
 import PyPDF2
 
-import io
-import win32print
-
-import fn_path
-
 
 class PaneMain(wx.Panel):
     """Debug login panel class. Automatically passes login check to following (landing) page
