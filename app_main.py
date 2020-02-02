@@ -18,18 +18,10 @@ class WindowFrame(wx.Frame):
         """Constructor"""
         wx.Frame.__init__(self, *args, **kwargs)
 
-        # Define the two primary sizers for different panes
-        # self.szr_login = wx.BoxSizer(wx.VERTICAL)
-        self.szr_main = wx.BoxSizer(wx.VERTICAL)
-
-        # Define the main pane, hide until after login, add to sizer
+        # Define the main pane  and add to the primary sizer
         self.pane_main = pane.PaneMain(self)
-        # self.pane_main.Hide()
+        self.szr_main = wx.BoxSizer(wx.VERTICAL)
         self.szr_main.Add(self.pane_main, proportion=1, flag=wx.EXPAND)
-
-        # Define the login pane, add to sizer
-        # self.pane_login = pane.PaneLogin(self, self.szr_main, self.pane_main)
-        # self.szr_login.Add(self.pane_login, proportion=1, flag=wx.EXPAND)
 
         # Define lower status bar
         self.status = self.CreateStatusBar(1)
@@ -43,9 +35,6 @@ class WindowFrame(wx.Frame):
         self.SetSizer(self.szr_main)
         self.Show()
 
-    # def evt_on_add(self, event):
-    #     pass
-
 
 if __name__ == '__main__':
     """Launch the application."""
@@ -56,9 +45,8 @@ if __name__ == '__main__':
     # First set build/dev mode
     mode.set_mode(getattr(sys, 'frozen', False))
 
-    # Define appliction and call config
+    # Define the application and call config
     app = wx.App(False)
-    config.load_config(app)
 
     # Define window size and frame, and start the main application loop
     win = WindowFrame(None, size=(400, 500))
