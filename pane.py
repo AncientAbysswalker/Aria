@@ -5,6 +5,9 @@ import wx
 import os
 import PyPDF2
 
+import io
+import win32print
+
 import fn_path
 
 
@@ -51,14 +54,14 @@ class PaneMain(wx.Panel):
         # self.wgt_print_to_desktop = wx.CheckBox(self, label="Save to Desktop")
         # self.wgt_print_to_desktop.SetValue(True)
         self.wgt_flatten_pdf = wx.CheckBox(self, label="Flatten PDF")
-        self.wgt_flatten_pdf.SetValue(False)
+        self.wgt_flatten_pdf.SetValue(False) #make linked to config?
 
         # Button Sizer
         self.szr_buttons = wx.BoxSizer(wx.VERTICAL)
         self.szr_buttons.Add(btn_add, flag=wx.CENTER)
         self.szr_buttons.Add(btn_merge, flag=wx.CENTER)
         self.szr_buttons.AddSpacer(5)
-        self.szr_buttons.Add(self.wgt_print_to_desktop, flag=wx.CENTER | wx.ALL, border=5)
+        # self.szr_buttons.Add(self.wgt_print_to_desktop, flag=wx.CENTER | wx.ALL, border=5)
         self.szr_buttons.Add(self.wgt_flatten_pdf, flag=wx.CENTER | wx.ALL, border=5)
         self.szr_buttons.Add(wx.StaticText(self), proportion=1)
         self.szr_buttons.Add(btn_clear, flag=wx.CENTER | wx.BOTTOM)
@@ -79,6 +82,8 @@ class PaneMain(wx.Panel):
             Args:
                 event: A button event
         """
+
+        ListPrinters()
 
         # Open an explorer dialog to select images to import
         with wx.FileDialog(None, "Open",
@@ -112,22 +117,6 @@ class PaneMain(wx.Panel):
         for document in self.ls_paths:
             pdf_merger.append(document)
 
-        # for page in merger.getPage(0)
-        # for j in range(0, len(page['/Annots'])):
-        #     writer_annot = page['/Annots'][j].getObject()
-        #     for field in data_dict:
-        #         if writer_annot.get('/T') == field:
-        #             writer_annot.update({
-        #                 NameObject("/Ff"): NumberObject(1)  # make ReadOnly
-        #             })
-
-        # # Determine save-to location
-        # if self.wgt_print_to_desktop.GetValue():
-        #     # Write to desktop
-        #     pdf_merger.write(os.path.join(os.path.expandvars('%UserProfile%'), 'Desktop', "merged.pdf"))
-        # else:
-        #     # Write to custom location
-
         with wx.FileDialog(None, "Save",
                            wildcard="pdf files (*.pdf)|*.pdf",
                            style=wx.FD_SAVE) as file_dialog:
@@ -138,16 +127,6 @@ class PaneMain(wx.Panel):
 
             # Save merged file to selected location
             pdf_merger.write(file_dialog.GetPath())
-            # print(file_dialog.GetPath())
-            # selected_files = [os.path.basename(your_path) for your_path in file_dialog.GetPaths()]
-
-        #
-        # dialog = wx.RichMessageDialog(self,
-        #                               caption="PDF Printed",
-        #                               message="The pdf has been printed to " + self.file_dest.GetValue(),
-        #                               style=wx.OK | wx.ICON_INFORMATION)
-        # dialog.ShowModal()
-        # dialog.Destroy()
 
         # Close merging gracefully
         pdf_merger.close()
@@ -167,110 +146,82 @@ class PaneMain(wx.Panel):
         self.wgt_added_docs.SetValue("")
 
 
-class PaneMain2(wx.Panel):
-    """Master pane that contains the normal operational widgets for the application
-
-        Class Variables:
-            bar_size (int): Size (height) of the top ribbon with the searchbar
-
-        Args:
-            parent (ptr): Reference to the wx.object this panel belongs to
-
-        Attributes:
-            parent (ptr): Reference to the wx.object this panel belongs to
-    """
-
-    bar_size = 25
-
-    def __init__(self, parent):
-        """Constructor"""
-        wx.Panel.__init__(self, parent)
-        self.SetDoubleBuffered(True)  # Remove odd effects at main switch to this pane after login
-
-        self.parent = parent
-
-        # Search bar and bind
-        self.wgt_searchbar = wx.TextCtrl(self,
-                                         size=(PaneMain.bar_size*10, PaneMain.bar_size),
-                                         style=wx.TE_PROCESS_ENTER)
-        self.wgt_searchbar.Bind(wx.EVT_TEXT_ENTER, self.evt_search)
-
-        # Search bar button and bind
-        btn_search = wx.BitmapButton(self,
-                                     bitmap=wx.Bitmap(fn_path.concat_gui('search.png')),
-                                     size=(PaneMain.bar_size, ) * 2)
-        btn_search.Bind(wx.EVT_BUTTON, self.evt_search)
-        btn_search.Bind(wx.EVT_SET_FOCUS, self.evt_button_no_focus)
-
-        # Notebook widget
-        self.wgt_notebook = tab.Notebook(self)
-
-        # Top bar sizer
-        szr_bar = wx.BoxSizer(wx.HORIZONTAL)
-        szr_bar.AddSpacer(3)
-        szr_bar.Add(self.wgt_searchbar)
-        szr_bar.AddSpacer(2)
-        szr_bar.Add(btn_search)
-
-        # Main Sizer
-        self.szr_main = wx.BoxSizer(wx.VERTICAL)
-        self.szr_main.Add(szr_bar, flag=wx.EXPAND)
-        self.szr_main.AddSpacer(1)
-        self.szr_main.Add(wx.StaticLine(self, style=wx.LI_HORIZONTAL), flag=wx.EXPAND)
-        self.szr_main.Add(self.wgt_notebook, proportion=1, flag=wx.EXPAND)
-
-        self.SetSizer(self.szr_main)
-
-    def evt_button_no_focus(self, event):
-        """Prevents focus from being called on the buttons
-
-            Args:
-                event: A focus event
-        """
-        pass
-
-    def evt_search(self, *args):
-        """Search for a part number and call open_parts_tab before emptying the searchbar
-
-            Args:
-                args[0]: Either None or a button click event
-        """
-
-        # Ensure there is something in the search bar before searching
-        if self.wgt_searchbar.GetValue().strip():
-            self.wgt_notebook.open_parts_tab(self.wgt_searchbar.GetValue())
-
-        # Empty the searchbar
-        self.wgt_searchbar.SetValue("")
+# def PrinterTest(s):
+#     out("win32ui printing test")
+#     th = 100
+#     x = 50
+#     y = 50
+#
+#     lines = s.split("\n")
+#
+#     hDC = win32ui.CreateDC()
+#     hDC.CreatePrinterDC("Brother HL-5370DW series")    #! change printer name
+#
+#     hDC.StartDoc("Python Printer Test")
+#     hDC.StartPage()
+#     for line in lines:
+#         hDC.TextOut(x, y, line)
+#         y += th
+#
+#     hDC.EndPage()
+#     hDC.EndDoc()
+#
+# def MSWinPrintTest(s):
+#     out("MSWinPrint test")
+#     doc = MSWinPrint.document() #! prints to default printer if nothing specified
+#     doc.begin_document()
+#
+#     size = doc.getsize()
+#     out("document size: %d, %d" % size)
+#
+#     out("setting font")
+#     doc.setfont("Consolas", 6)
+#
+#     x  = 72*6   # 18 # .25"
+#     y  = 18
+#     th = 6
+#
+#     out("printing lines")
+#     lines = s.split("\n")
+#
+#     for line in lines:
+#         doc.text((x, y), line)
+#         y += th
+#
+#     out("printing image")
+#     img = Image.open("c:\projects\pics\NorthCapeCodMap.bmp")
+#     scale = 0.20
+#     neww = int(img.size[0] * scale)
+#     newh = int(img.size[1] * scale)
+#     doc.image((18,18), img, (neww, newh))           #! change image names
+#
+#     out("printing another image")
+#     img = Image.open("C:\projects\pics\Windham-20110503-00005.jpg")
+#     scale = 0.10
+#     neww = int(img.size[0] * scale)
+#     newh = int(img.size[1] * scale)
+#     doc.image((18, 72*6), img, (neww, newh))
+#
+#     doc.rectangle((0, 0, 72*7.9, 72*10.25))
+#     out("finishing up")
+#     doc.end_document()
+#     out("done")
 
 
-class PaneLogin(wx.Panel):
-    """Master pane that deals with login behaviour for the application.
+def ListPrinters():
+    default = MSWinPrint.listprinters()
+    print(default)
+    print("-"*20)
+    for p in MSWinPrint.prdict:
+        print(p)
+    print("-"*20)
+#
+#
+# s = gu.LoadFile(__file__)
+#
+# PrinterTest(s)
+# #z MSWinPrintTest(s)
+#
+# #z ListPrinters()
 
-        Args:
-            parent (ptr): Reference to the wx.object this panel belongs to
-            sizer_landing (ptr): Reference to the sizer (of the parent) the landing pane belongs to
-            pane_landing (ptr): Reference to the landing pane
-
-        Attributes:
-            parent (ptr): Reference to the wx.object this panel belongs to
-    """
-
-    def __init__(self, parent, sizer_landing, pane_landing):
-        """Constructor"""
-        wx.Panel.__init__(self, parent)
-        self.SetDoubleBuffered(True)  # Remove slight strobing on failed login
-
-        self.parent = parent
-
-        # Widget that controls user login auth - currently set to debug (no auth) for testing and dev
-        login_panel = login.LoginDebug(self, sizer_landing, pane_landing)
-
-        # Main Sizer
-        sizer_main = wx.BoxSizer(wx.VERTICAL)
-        sizer_main.AddStretchSpacer()
-        sizer_main.Add(login_panel, flag=wx.CENTER)
-        sizer_main.AddStretchSpacer()
-
-        # Set main sizer
-        self.SetSizer(sizer_main)
+###
