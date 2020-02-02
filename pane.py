@@ -7,24 +7,15 @@ import PyPDF2
 
 
 class PaneMain(wx.Panel):
-    """Debug login panel class. Automatically passes login check to following (landing) page
+    """Main panel class. Controls the behaviour of the application
 
             Args:
                 parent (ptr): Reference to the wx.object this panel belongs to
-                sizer_landing (ptr): Reference to the sizer (of the parent) the landing pane belongs to
-                pane_landing (ptr): Reference to the landing pane
-                bound_text (str, optional): String to display in the login panel bounding box
-                user_last (str, optional): String to initially display within the "user" textbox
-                pass_last (str, optional): String to initially display within the "passkey" textbox
-                user_text (str, optional): String to display preceding the "user" textbox
-                pass_text (str, optional): String to display preceding the "passkey" textbox
 
             Attributes:
                 parent (ptr): Reference to the wx.object this panel belongs to
-                sizer_landing (ptr): Reference to the sizer (of the parent) the landing pane belongs to
-                pane_landing (ptr): Reference to the landing pane
-                login_user (ptr): Reference to the "user" textbox
-                login_pass (ptr): Reference to the "passkey" textbox
+                ls_paths (list: str): List of string representation of full filepaths to PDF files to merge
+                ls_files (list: str): List of string representation of filenames of PDF files to merge
         """
 
     def __init__(self, parent, *args, **kwargs):
@@ -37,7 +28,7 @@ class PaneMain(wx.Panel):
         self.ls_paths = []
         self.ls_files = []
 
-        # Button Widget Objects
+        # Button widget objects and their binds
         btn_add = wx.Button(self, size=(75, 25), label="ADD")
         self.Bind(wx.EVT_BUTTON, self.evt_add, btn_add)
         btn_merge = wx.Button(self, size=(75, 25), label="MERGE")
@@ -45,7 +36,7 @@ class PaneMain(wx.Panel):
         btn_clear = wx.Button(self, size=(75, 25), label="CLEAR")
         self.Bind(wx.EVT_BUTTON, self.evt_clear, btn_clear)
 
-        # Button Sizer
+        # Buttons Sizer
         self.szr_buttons = wx.BoxSizer(wx.VERTICAL)
         self.szr_buttons.Add(btn_add, flag=wx.CENTER)
         self.szr_buttons.Add(btn_merge, flag=wx.CENTER)
@@ -53,7 +44,7 @@ class PaneMain(wx.Panel):
         self.szr_buttons.Add(wx.StaticText(self), proportion=1)
         self.szr_buttons.Add(btn_clear, flag=wx.CENTER | wx.BOTTOM)
 
-        # Added PDFs
+        # Added PDFs display pane
         self.wgt_added_docs = wx.TextCtrl(self, size=(750, 1500), style=wx.TE_READONLY | wx.TE_MULTILINE | wx.EXPAND)
 
         # Overall Sizer

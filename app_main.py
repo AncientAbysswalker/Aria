@@ -9,6 +9,9 @@ import mode
 
 import fn_path
 
+# Set global build number to display
+BUILD = "1.0.0"
+
 
 class WindowFrame(wx.Frame):
     """Base class defining the application window (frame)"""
@@ -23,8 +26,12 @@ class WindowFrame(wx.Frame):
         self.szr_main.Add(self.pane_main, proportion=1, flag=wx.EXPAND)
 
         # Define lower status bar
-        self.status = self.CreateStatusBar(1)
-        self.status.SetStatusText("Written by Ancient Abysswalker")
+        self.status_bar = wx.StatusBar(self, 1)
+        self.status_bar.SetFieldsCount(2)
+        self.status_bar.SetStatusWidths([-1, 55])
+        self.SetStatusBar(self.status_bar)
+        self.status_bar.SetStatusText("Written by Ancient Abysswalker", 0)
+        self.status_bar.SetStatusText("Build " + BUILD, 1)
 
         # Set icon
         self.SetIcon(wx.Icon(fn_path.concat_gui('icon.png')))
@@ -38,9 +45,6 @@ class WindowFrame(wx.Frame):
 if __name__ == '__main__':
     """Launch the application."""
 
-    # Set build number to display
-    build = "1.0.0"
-
     # First set build/dev mode
     mode.set_mode(getattr(sys, 'frozen', False))
 
@@ -49,5 +53,5 @@ if __name__ == '__main__':
 
     # Define window size and frame, and start the main application loop
     win = WindowFrame(None, size=(400, 500))
-    win.SetTitle("Aria - Build " + build)
+    win.SetTitle("Aria - A simple tool to merge PDFs")
     app.MainLoop()

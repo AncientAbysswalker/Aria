@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Controls only two variables, handling the development vs build state of the application. This is set at the time of
+"""Controls several variables, handling the development vs build state of the application. This is set at the time of
 build, and can reference either to this local folder, or to the temporary folder when files are bundled to the .exe
 
     Attributes:
