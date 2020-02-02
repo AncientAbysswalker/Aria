@@ -45,19 +45,11 @@ class PaneMain(wx.Panel):
         btn_clear = wx.Button(self, size=(75, 25), label="CLEAR")
         self.Bind(wx.EVT_BUTTON, self.evt_clear, btn_clear)
 
-        # Checkbox Widget Objects
-        # self.wgt_print_to_desktop = wx.CheckBox(self, label="Save to Desktop")
-        # self.wgt_print_to_desktop.SetValue(True)
-        self.wgt_flatten_pdf = wx.CheckBox(self, label="Flatten PDF")
-        self.wgt_flatten_pdf.SetValue(False) #make linked to config?
-
         # Button Sizer
         self.szr_buttons = wx.BoxSizer(wx.VERTICAL)
         self.szr_buttons.Add(btn_add, flag=wx.CENTER)
         self.szr_buttons.Add(btn_merge, flag=wx.CENTER)
         self.szr_buttons.AddSpacer(5)
-        # self.szr_buttons.Add(self.wgt_print_to_desktop, flag=wx.CENTER | wx.ALL, border=5)
-        self.szr_buttons.Add(self.wgt_flatten_pdf, flag=wx.CENTER | wx.ALL, border=5)
         self.szr_buttons.Add(wx.StaticText(self), proportion=1)
         self.szr_buttons.Add(btn_clear, flag=wx.CENTER | wx.BOTTOM)
 

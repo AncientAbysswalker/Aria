@@ -7,7 +7,6 @@ import wx
 import pane
 import mode
 
-import config
 import fn_path
 
 
@@ -31,7 +30,7 @@ class WindowFrame(wx.Frame):
         self.SetIcon(wx.Icon(fn_path.concat_gui('icon.png')))
 
         # Set window minimum size, set starting sizer and show window
-        self.SetMinSize((400, 500))
+        self.SetMinSize((300, 300))
         self.SetSizer(self.szr_main)
         self.Show()
 
