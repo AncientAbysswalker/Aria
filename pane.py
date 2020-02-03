@@ -90,7 +90,6 @@ class PaneMain(wx.Panel):
 
         # Check if the list is populated
         if self.ls_paths:
-            print(356)
             # Assemble PDF
             pdf_merger = PyPDF2.PdfFileMerger(strict=False)
             for document in self.ls_paths:

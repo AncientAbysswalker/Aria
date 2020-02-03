@@ -18,7 +18,6 @@ frozen = None
 
 # Read the state of whether the app is frozen for build and what the mode.app_root is
 def set_mode(is_frozen):
-    print(is_frozen)
     globals()['app_root'] = sys._MEIPASS if is_frozen else os.path.dirname(os.path.abspath(__file__))
     globals()['exe_location'] = os.path.dirname(sys.executable) if is_frozen else os.path.dirname(os.path.abspath(__file__))
     globals()['frozen'] = is_frozen
