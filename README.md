@@ -2,9 +2,7 @@
 Simple Application to Merge PDF Files
 
 ## Working Executable
-A working executable can be found at the following for download:
-
-___
+A working executable can be downloaded [here](https://github.com/AncientAbysswalker/Aria/raw/master/build/Aria.exe).
 
 ## Problem Statement
 Most PDF modification and merging tools cost a fair amount or are poorly-implemented web solutions. This creates a 
@@ -21,3 +19,5 @@ application has only three buttons that trigger functions for the program:
 
 The box encompassing the right portion of the screen is where all the PDFs currently slotted for merge are listed.
 
+![Window Preview](https://raw.githubusercontent.com/AncientAbysswalker/Aria/master/md/preview.png)
+![Merge Save Confirmation](https://raw.githubusercontent.com/AncientAbysswalker/Aria/master/md/saved.png)
