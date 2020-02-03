@@ -90,11 +90,7 @@ class PaneMain(wx.Panel):
 
         # Check if the list is populated
         if self.ls_paths:
-            # Assemble PDF
-            pdf_merger = PyPDF2.PdfFileMerger(strict=False)
-            for document in self.ls_paths:
-                pdf_merger.append(document)
-
+            # Determine save-to location
             with wx.FileDialog(None, "Save",
                                wildcard="pdf files (*.pdf)|*.pdf",
                                style=wx.FD_SAVE) as file_dialog:
@@ -103,11 +99,25 @@ class PaneMain(wx.Panel):
                 if file_dialog.ShowModal() == wx.ID_CANCEL:
                     return
 
+                # Assemble PDF
+                pdf_merger = PyPDF2.PdfFileMerger(strict=False)
+                for document in self.ls_paths:
+                    pdf_merger.append(document)
+
                 # Save merged file to selected location
                 pdf_merger.write(file_dialog.GetPath())
 
-            # Close merging gracefully
-            pdf_merger.close()
+                # Close merging gracefully
+                pdf_merger.close()
+
+                # Merge Success Confirmation
+                dialog = wx.RichMessageDialog(self,
+                                              caption="PDF Merged",
+                                              message="The PDF has been successfully saved to:\n\n" +
+                                                      file_dialog.GetPath(),
+                                              style=wx.OK | wx.ICON_INFORMATION)
+                dialog.ShowModal()
+                dialog.Destroy()
 
     def evt_clear(self, event):
         """Clears the widget listing files to merge
