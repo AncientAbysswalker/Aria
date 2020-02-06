@@ -99,25 +99,35 @@ class PaneMain(wx.Panel):
                 if file_dialog.ShowModal() == wx.ID_CANCEL:
                     return
 
-                # Assemble PDF
-                pdf_merger = PyPDF2.PdfFileMerger(strict=False)
-                for document in self.ls_paths:
-                    pdf_merger.append(document)
+                try:
+                    # Assemble PDF
+                    pdf_merger = PyPDF2.PdfFileMerger(strict=False)
+                    for document in self.ls_paths:
+                        pdf_merger.append(document)
 
-                # Save merged file to selected location
-                pdf_merger.write(file_dialog.GetPath())
+                    # Save merged file to selected location
+                    pdf_merger.write(file_dialog.GetPath())
 
-                # Close merging gracefully
-                pdf_merger.close()
+                    # Close merging gracefully
+                    pdf_merger.close()
 
-                # Merge Success Confirmation
-                dialog = wx.RichMessageDialog(self,
-                                              caption="PDF Merged",
-                                              message="The PDF has been successfully saved to:\n\n" +
-                                                      file_dialog.GetPath(),
-                                              style=wx.OK | wx.ICON_INFORMATION)
-                dialog.ShowModal()
-                dialog.Destroy()
+                    # Merge Success Confirmation
+                    dialog = wx.RichMessageDialog(self,
+                                                  caption="PDF Merged",
+                                                  message="The PDF has been successfully saved to:\n\n" +
+                                                          file_dialog.GetPath(),
+                                                  style=wx.OK | wx.ICON_INFORMATION)
+                    dialog.ShowModal()
+                    dialog.Destroy()
+
+                except Exception as e:
+                    # Throw exception to dialog
+                    dialog = wx.RichMessageDialog(self,
+                                                  caption="An exception occurred",
+                                                  message=str(e),
+                                                  style=wx.OK | wx.ICON_ERROR)
+                    dialog.ShowModal()
+                    dialog.Destroy()
 
     def evt_clear(self, event):
         """Clears the widget listing files to merge

@@ -10,7 +10,7 @@ import mode
 import fn_path
 
 # Set global build number to display
-BUILD = "1.0.0"
+BUILD = "1.0.1"
 
 
 class WindowFrame(wx.Frame):
