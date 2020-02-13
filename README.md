@@ -17,7 +17,9 @@ application has only three buttons that trigger functions for the program:
 * MERGE: Request save destination and save merged file there
 * CLEAR: Reset list of PDFs to merge
 
-The box encompassing the right portion of the screen is where all the PDFs currently slotted for merge are listed.
+The box encompassing the right portion of the screen is where all the PDFs currently slotted for merge are listed. This 
+box has functionality so that PDF files dragged onto from the file explorer it will be added to the list the same as if 
+using the ADD button.
 
 ![Window Preview](https://raw.githubusercontent.com/AncientAbysswalker/Aria/master/md/preview.png)
 ![Merge Save Confirmation](https://raw.githubusercontent.com/AncientAbysswalker/Aria/master/md/saved.png)
