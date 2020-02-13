@@ -6,6 +6,39 @@ import os
 import PyPDF2
 
 
+class DummyFileDrop(wx.FileDropTarget):
+    """Dummy class to catch files dropped onto the add documents button
+
+        Args:
+            parent (ref): Reference to the parent wx.object
+            target_function (ref): Reference to the intended function to trigger and pass filepaths to
+
+        Attributes:
+            parent (ref): Reference to the parent wx.object
+            target_function (ref): Reference to the intended function to trigger and pass filepaths to
+    """
+
+    def __init__(self, parent, target_function):
+        """Constructor"""
+        wx.FileDropTarget.__init__(self)
+
+        self.window = parent
+        self.target_function = target_function
+
+    def OnDropFiles(self, x, y, file_paths):
+        """Trigger target_function when files are dropped onto this widget
+
+            Args:
+                x (int): Integer x position that the file(s) were dropped on
+                y (int): Integer y position that the file(s) were dropped on
+                file_paths (list: str): A list of string paths for the file(s) dropped onto this widget
+        """
+
+        self.target_function(file_paths)
+
+        return True
+
+
 class PaneMain(wx.Panel):
     """Main panel class. Controls the behaviour of the application
 
@@ -44,8 +77,11 @@ class PaneMain(wx.Panel):
         self.szr_buttons.Add(wx.StaticText(self), proportion=1)
         self.szr_buttons.Add(btn_clear, flag=wx.CENTER | wx.BOTTOM)
 
-        # Added PDFs display pane
+        # Added PDF list display pane
         self.wgt_added_docs = wx.TextCtrl(self, size=(750, 1500), style=wx.TE_READONLY | wx.TE_MULTILINE | wx.EXPAND)
+
+        # Hook in drag-drop functionality to PDF list display pane
+        self.wgt_added_docs.SetDropTarget(DummyFileDrop(self, self.evt_dragged_files))
 
         # Overall Sizer
         szr_main = wx.BoxSizer(wx.HORIZONTAL)
@@ -53,6 +89,20 @@ class PaneMain(wx.Panel):
         szr_main.Add(self.wgt_added_docs, proportion=3, flag=wx.EXPAND)
 
         self.SetSizer(szr_main)
+
+    def update_files(self, new_paths):
+        """Add file(s) to list of files to merge
+
+            Args:
+                new_paths (list: str): List of string representation of full filepaths new PDF files to add to the list
+        """
+
+        # Extend the internal lists of the files
+        self.ls_paths.extend(new_paths)
+        self.ls_files.extend([os.path.basename(file_path) for file_path in new_paths])
+
+        # Update the widget to display new files list
+        self.wgt_added_docs.SetValue("\n".join(self.ls_files))
 
     def evt_add(self, event):
         """Add file(s) to list of files to merge
@@ -70,16 +120,8 @@ class PaneMain(wx.Panel):
             if file_dialog.ShowModal() == wx.ID_CANCEL:
                 return
 
-            # Make a list of chosen images to add to the database
-            selected_paths = file_dialog.GetPaths()
-            selected_files = [os.path.basename(your_path) for your_path in file_dialog.GetPaths()]
-
-        # Proceed loading the file(s) chosen by the user to the "add image" dialog
-        self.ls_paths.extend(selected_paths)
-        self.ls_files.extend(selected_files)
-
-        # Update the widget to display new files list
-        self.wgt_added_docs.SetValue("\n".join(self.ls_files))
+            # Add selected files to the list of PDFs
+            self.update_files(file_dialog.GetPaths())
 
     def evt_submit(self, event):
         """Merges the intended PDF file
@@ -99,8 +141,8 @@ class PaneMain(wx.Panel):
                 if file_dialog.ShowModal() == wx.ID_CANCEL:
                     return
 
+                # Assemble PDF
                 try:
-                    # Assemble PDF
                     pdf_merger = PyPDF2.PdfFileMerger(strict=False)
                     for document in self.ls_paths:
                         pdf_merger.append(document)
@@ -110,24 +152,23 @@ class PaneMain(wx.Panel):
 
                     # Close merging gracefully
                     pdf_merger.close()
-
-                    # Merge Success Confirmation
-                    dialog = wx.RichMessageDialog(self,
-                                                  caption="PDF Merged",
-                                                  message="The PDF has been successfully saved to:\n\n" +
-                                                          file_dialog.GetPath(),
-                                                  style=wx.OK | wx.ICON_INFORMATION)
-                    dialog.ShowModal()
-                    dialog.Destroy()
-
                 except Exception as e:
-                    # Throw exception to dialog
                     dialog = wx.RichMessageDialog(self,
                                                   caption="An exception occurred",
                                                   message=str(e),
                                                   style=wx.OK | wx.ICON_ERROR)
                     dialog.ShowModal()
                     dialog.Destroy()
+                    return
+
+                # Merge Success Confirmation
+                dialog = wx.RichMessageDialog(self,
+                                              caption="PDF Merged",
+                                              message="The PDF has been successfully saved to:\n\n" +
+                                                      file_dialog.GetPath(),
+                                              style=wx.OK | wx.ICON_INFORMATION)
+                dialog.ShowModal()
+                dialog.Destroy()
 
     def evt_clear(self, event):
         """Clears the widget listing files to merge
@@ -142,3 +183,23 @@ class PaneMain(wx.Panel):
 
         # Reset widget
         self.wgt_added_docs.SetValue("")
+
+    def evt_dragged_files(self, file_paths):
+        """Trigger dialog to add new documents
+
+            Args:
+                file_paths (list: str): A list of string paths for the file(s) dropped onto this widget
+        """
+
+        # Add dragged files to the list of PDFs
+        self.update_files(self.only_pdf(file_paths))
+
+    @staticmethod
+    def only_pdf(path_list):
+        """Convert a list of filepaths to a list of filepaths containing only PDFs
+
+            Args:
+                path_list (list: str): List of string representations of full filepaths
+        """
+
+        return [pdf for pdf in path_list if os.path.splitext(pdf)[1] == ".pdf"]
