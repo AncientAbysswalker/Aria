@@ -23,3 +23,8 @@ using the ADD button.
 
 ![Window Preview](https://raw.githubusercontent.com/AncientAbysswalker/Aria/master/md/preview.png)
 ![Merge Save Confirmation](https://raw.githubusercontent.com/AncientAbysswalker/Aria/master/md/saved.png)
+
+#### Origin of the Project Name
+At the time of writing this program I was relatively annoyed with the available "free" solutions to merge PDFs. I 
+considered the first successfully merged PDF to be the "siren song of a successfully merged PDF"; thus the name Aria. 
+Yes, I realize that merging PDFs does not make any noise, but this is what popped unto my head and thus the name.
